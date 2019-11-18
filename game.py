@@ -7,8 +7,9 @@ scWidth = 800
 win = pygame.display.set_mode((scLength,scWidth))
 pygame.display.set_caption('Pong-Game')
 
-bg = pygame.image.load('bg.png')
 pad = pygame.image.load('paddle.png')
+
+clock = pygame.time.Clock()
 
 #class for paddle
 class paddle(object):
@@ -34,42 +35,43 @@ class paddle(object):
 
 #ball class
 class ball(object):
-	def __init__(self,x,y):
+	def __init__(self,x,y,win):
 		self.x = x
 		self.y = y
-		self.vel = 15
+		self.vel = 30
+		self.xm = self.vel
+		self.ym = -self.vel
+		self.win = win
 
-	def draw(self,win):
+	def draw(self):
 		self.move()
-		pygame.draw.circle(win,(255,255,255),(self.x,self.y),15,15)
+		pygame.draw.circle(win,(255,255,255),(self.x,self.y),12,12)
 
 	def move(self):
-		keys = pygame.key.get_pressed()
-
-		if keys[pygame.K_KP8] and self.y - self.vel >= 0:
-			self.y -= self.vel
-		elif keys[pygame.K_KP5] and self.y + self.vel + 100 < 800:
-			self.y += self.vel
-		if keys[pygame.K_KP4] :
-			self.x -= self.vel
-		elif keys[pygame.K_KP6] :
-			self.x += self.vel
+		self.x = self.x + self.xm
+		self.y = self.y + self.ym
+		if self.y <= 0:
+			self.ym = +self.vel
+		if self.y >= scWidth:
+			self.ym = -self.vel
 
 #as the name suggests
 def redrawGameWindow():
-	win.blit(bg,(0,0))
+	win.fill((0,0,0))
 	P1.draw(win,pygame.K_UP,pygame.K_DOWN)
 	P2.draw(win,pygame.K_w,pygame.K_s)
-	B.draw(win)
+	B.draw()
 	pygame.display.update()
 
 #main-loop
 P1 = paddle(scLength-50,(scWidth-180)//2)
 P2 = paddle(30,(scWidth-180)//2)
-B = ball(30+30,(scWidth-180)//2)
+B = ball(30,scWidth//2,win)
 
 run = True
 while run:
+	clock.tick(30)
+
 	pygame.time.delay(100)
 
 	for event in pygame.event.get():
